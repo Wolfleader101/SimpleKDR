@@ -1,0 +1,13 @@
+bin/
+obj/
+/packages/
+riderModule.iml
+/_ReSharper.Caches/
+.idea/.idea.SimpleKDR/.idea/workspace.xml
+.idea/.idea.SimpleKDR/.idea/vcs.xml
+.idea/.idea.SimpleKDR/.idea/projectSettingsUpdater.xml
+.idea/.idea.SimpleKDR/.idea/modules.xml
+.idea/.idea.SimpleKDR/.idea/indexLayout.xml
+.idea/.idea.SimpleKDR/.idea/encodings.xml
+.idea/.idea.SimpleKDR/.idea/discord.xml
+.idea/.idea.SimpleKDR/.idea/contentModel.xml
