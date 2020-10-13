@@ -265,8 +265,8 @@ namespace Oxide.Plugins
                     },
                     RectTransform =
                     {
-                        AnchorMin = $"0 {1 - 0.1 * i + 0.006}",
-                        AnchorMax = $"1 0.9"
+                        AnchorMin = $"0 {1 - 0.1 * i - 0.2}", //
+                        AnchorMax = $"1 {1 - 0.1 * i + 0.006}", 
                     }
                 };
                 container.Add(playerItem, mainName);
