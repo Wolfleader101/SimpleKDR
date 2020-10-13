@@ -131,8 +131,8 @@ namespace Oxide.Plugins
                 {
                     AnchorMin = "0 0.5",
                     AnchorMax = "0.0 0.5",
-                    OffsetMin = "-175 -200",
-                    OffsetMax = "175 200"
+                    OffsetMin = "25 -100",
+                    OffsetMax = "500 350"
                 },
                 CursorEnabled = true
             }, "Overlay", "BackgroundName");
@@ -170,7 +170,7 @@ namespace Oxide.Plugins
                 RectTransform =
                 {
                     AnchorMin = "0 0.9",
-                    AnchorMax = "0.2 1",
+                    AnchorMax = "0.1 1",
                     OffsetMin = "-50 -50",
                     OffsetMax = "50 50"
                 }
@@ -187,7 +187,7 @@ namespace Oxide.Plugins
                 },
                 RectTransform =
                 {
-                    AnchorMin = "0.2 0.9",
+                    AnchorMin = "0.1 0.9",
                     AnchorMax = "0.4 1",
                     OffsetMin = "-50 -50",
                     OffsetMax = "50 50"
@@ -206,7 +206,7 @@ namespace Oxide.Plugins
                 RectTransform =
                 {
                     AnchorMin = "0.4 0.9",
-                    AnchorMax = "0.6 1",
+                    AnchorMax = "0.5 1",
                     OffsetMin = "-50 -50",
                     OffsetMax = "50 50"
                 }
@@ -223,8 +223,8 @@ namespace Oxide.Plugins
                 },
                 RectTransform =
                 {
-                    AnchorMin = "0.6 0.9",
-                    AnchorMax = "0.8 1",
+                    AnchorMin = "0.5 0.9",
+                    AnchorMax = "0.6 1",
                     OffsetMin = "-50 -50",
                     OffsetMax = "50 50"
                 }
@@ -241,8 +241,8 @@ namespace Oxide.Plugins
                 },
                 RectTransform =
                 {
-                    AnchorMin = "0.8 0.9",
-                    AnchorMax = "1 1",
+                    AnchorMin = "0.6 0.9",
+                    AnchorMax = "0.8 1",
                     OffsetMin = "-50 -50",
                     OffsetMax = "50 50"
                 }
@@ -261,12 +261,12 @@ namespace Oxide.Plugins
                     {
                         Text = $"{i} {topPlayer.name}",
                         FontSize = 18,
-                        Align = TextAnchor.MiddleCenter
+                        Align = TextAnchor.UpperLeft
                     },
                     RectTransform =
                     {
-                        AnchorMin = $"0.06 {1 - 0.07 * i + 0.006}",
-                        AnchorMax = $"0.75 {1 - 0.07 * (i - 1)}"
+                        AnchorMin = $"0 {1 - 0.1 * i + 0.006}",
+                        AnchorMax = $"1 0.9"
                     }
                 };
                 container.Add(playerItem, mainName);
