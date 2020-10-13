@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Oxide.Core;
 using Oxide.Core.Configuration;
 using Oxide.Core.Libraries.Covalence;
+using Oxide.Game.Rust.Cui;
 using Steamworks.ServerList;
+using UnityEngine;
 
 namespace Oxide.Plugins
 {
@@ -42,8 +45,8 @@ namespace Oxide.Plugins
             if (player == info.InitiatorPlayer) return;
 
             // RE ENABLE LATER
-           // if (player.inventory.FindItemID("rifle.ak") == null ||
-           //     player.inventory.FindItemID("lmg.M249") == null) return;
+            // if (player.inventory.FindItemID("rifle.ak") == null ||
+            //     player.inventory.FindItemID("lmg.M249") == null) return;
 
 
             IncreaseKills(info.InitiatorPlayer);
@@ -51,13 +54,13 @@ namespace Oxide.Plugins
         }
 
         #endregion
-        
+
         #region Methods
 
         void IncreaseKills(BasePlayer player)
         {
-            if(player == null) return;
-            
+            if (player == null) return;
+
             var foundPlayer = _storedData.Players.Find(item => item.name == player.displayName);
             foundPlayer.kills++;
             UpdateRatio(foundPlayer);
@@ -65,10 +68,10 @@ namespace Oxide.Plugins
 
         void IncreaseDeaths(BasePlayer player)
         {
-            if(player == null) return;
+            if (player == null) return;
             var foundPlayer = _storedData.Players.Find(item => item.name == player.displayName);
-            if(foundPlayer == null) return;
-            
+            if (foundPlayer == null) return;
+
             foundPlayer.deaths++;
             UpdateRatio(foundPlayer);
         }
@@ -96,24 +99,92 @@ namespace Oxide.Plugins
         [Command("kd")]
         private void KDCommand(IPlayer player, string command, string[] args)
         {
-            //BasePlayer basePlayer = player.Object as BasePlayer;
             var foundPlayer = _storedData.Players.Find(item => item.name == player.Name);
-            
-            player.Reply($"<align=center><color=red><b>Your KDR is:</b></color> <color=green>{foundPlayer.ratio} </color>\n"+   
-                            $"<color=green><b>Kills:</b> {foundPlayer.kills} </color>  \n"+
-                            $"<color=red><b>Deaths:</b> {foundPlayer.deaths} </color> \n"
-                            );
-            
-            
-                
+
+            player.Reply(
+                $"<align=center><color=red><b>Your KDR is:</b></color> <color=green>{foundPlayer.ratio} </color>\n" +
+                $"<color=green><b>Kills:</b> {foundPlayer.kills} </color>  \n" +
+                $"<color=red><b>Deaths:</b> {foundPlayer.deaths} </color> \n"
+            );
+
+
             if (args.Length > 0)
             {
-                
             }
         }
 
+        [Command("top")]
+        private void TopCommand(IPlayer player, string commmand, string[] args)
+        {
+            var topPlayers = _storedData.Players.OrderByDescending(item => item.kills).Take(10).ToList();
+            //Puts($"{topPlayers[0].kills}");
+
+            BasePlayer basePlayer = player.Object as BasePlayer;
+            var container = new CuiElementContainer();
+            var mainName = container.Add(new CuiPanel
+            {
+                Image =
+                {
+                    Color = "0.39 0.39 0.39 0.75"
+                },
+                RectTransform =
+                {
+                    AnchorMin = "0.05 0.4",
+                    AnchorMax = "0.6 0.85",
+                    OffsetMin = "-50 -50",
+                    OffsetMax = "50 75"
+                },
+                CursorEnabled = true
+            }, "Overlay", "BackgroundName");
+            var closeButton = new CuiButton
+            {
+                Button =
+                {
+                    Close = mainName,
+                    Color = "1 0 0 0.78"
+                },
+                RectTransform =
+                {
+                    AnchorMin = "0.930 0.940",
+                    AnchorMax = "1 1",
+                    OffsetMin = "-1 -1",
+                    OffsetMax = "1 1"
+                },
+                Text =
+                {
+                    Text = "X",
+                    FontSize = 14,
+                    Align = TextAnchor.MiddleCenter
+                }
+            };
+            container.Add(closeButton, mainName);
+
+            int i = 1;
+            foreach (var topPlayer in topPlayers)
+            {
+                var playerItem = new CuiLabel
+                {
+                    Text =
+                    {
+                        Text = $"{i} {topPlayer.name}",
+                        FontSize = 18,
+                        Align = TextAnchor.MiddleCenter
+                    },
+                    RectTransform =
+                    {
+                        AnchorMin = $"0.06 {1 - 0.07 * i + 0.006}",
+                        AnchorMax = $"0.75 {1 - 0.07 * (i - 1)}"
+                    }
+                };
+                container.Add(playerItem, mainName);
+                i++;
+            }
+
+            CuiHelper.AddUi(basePlayer, container);
+        }
+
         #endregion
-        
+
         #region Data Class
 
         private class StoredData
