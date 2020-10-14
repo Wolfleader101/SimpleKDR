@@ -131,11 +131,187 @@ namespace Oxide.Plugins
                 {
                     AnchorMin = "0 0.5",
                     AnchorMax = "0.0 0.5",
-                    OffsetMin = "25 -100",
+                    OffsetMin = "25 -200",
                     OffsetMax = "500 350"
                 },
                 CursorEnabled = true
             }, "Overlay", "BackgroundName");
+
+            var RankLabel = new CuiLabel
+            {
+                Text =
+                {
+                    Text = "Rank",
+                    FontSize = 18,
+                    Align = TextAnchor.MiddleCenter
+                },
+                RectTransform =
+                {
+                    AnchorMin = "0 0.9",
+                    AnchorMax = "0.2 1",
+                    OffsetMin = "-50 -50",
+                    OffsetMax = "50 50"
+                }
+            };
+            container.Add(RankLabel, mainName);
+            
+            var NameLabel = new CuiLabel
+            {
+                Text =
+                {
+                    Text = "Name",
+                    FontSize = 18,
+                    Align = TextAnchor.MiddleCenter
+                },
+                RectTransform =
+                {
+                    AnchorMin = "0.2 0.9",
+                    AnchorMax = "0.4 1",
+                    OffsetMin = "-50 -50",
+                    OffsetMax = "50 50"
+                }
+            };
+            container.Add(NameLabel, mainName);
+            
+            var KillsLabel = new CuiLabel
+            {
+                Text =
+                {
+                    Text = "Kills",
+                    FontSize = 18,
+                    Align = TextAnchor.MiddleCenter
+                },
+                RectTransform =
+                {
+                    AnchorMin = "0.4 0.9",
+                    AnchorMax = "0.6 1",
+                    OffsetMin = "-50 -50",
+                    OffsetMax = "50 50"
+                }
+            };
+            container.Add(KillsLabel, mainName);
+            
+            var DeathsLabel = new CuiLabel
+            {
+                Text =
+                {
+                    Text = "Deaths",
+                    FontSize = 18,
+                    Align = TextAnchor.MiddleCenter
+                },
+                RectTransform =
+                {
+                    AnchorMin = "0.6 0.9",
+                    AnchorMax = "0.7 1",
+                    OffsetMin = "-50 -50",
+                    OffsetMax = "50 50"
+                }
+            };
+            container.Add(DeathsLabel, mainName);
+            
+            var RatioLabel = new CuiLabel
+            {
+                Text =
+                {
+                    Text = "Ratio",
+                    FontSize = 18,
+                    Align = TextAnchor.MiddleCenter
+                },
+                RectTransform =
+                {
+                    AnchorMin = "0.7 0.9",
+                    AnchorMax = "0.9 1",
+                    OffsetMin = "-50 -50",
+                    OffsetMax = "50 50"
+                }
+            };
+            container.Add(RatioLabel, mainName);
+            
+            
+            
+
+            int i = 1;
+            foreach (var topPlayer in topPlayers)
+            {
+                var PlayerRank = new CuiLabel
+                {
+                    Text =
+                    {
+                        Text = $"{i}",
+                        FontSize = 14,
+                        Align = TextAnchor.UpperCenter
+                    },
+                    RectTransform =
+                    {
+                        AnchorMin = $"0 {1 - 0.1 * i - 0.05}",
+                        AnchorMax = $"0.2 {1 - 0.1 * i}",
+                    }
+                };
+                container.Add(PlayerRank, mainName);
+                var PlayerName = new CuiLabel
+                {
+                    Text =
+                    {
+                        Text = $"{topPlayer.name}",
+                        FontSize = 14,
+                        Align = TextAnchor.UpperLeft
+                    },
+                    RectTransform =
+                    {
+                        AnchorMin = $"0.2 {1 - 0.1 * i - 0.2}",
+                        AnchorMax = $"0.4 {1 - 0.1 * i + 0.006}", 
+                    }
+                };
+                container.Add(PlayerName, mainName);
+                var PlayerKills = new CuiLabel
+                {
+                    Text =
+                    {
+                        Text = $"{topPlayer.kills}",
+                        FontSize = 14,
+                        Align = TextAnchor.UpperCenter
+                    },
+                    RectTransform =
+                    {
+                        AnchorMin = $"0.4 {1 - 0.1 * i - 0.2}",
+                        AnchorMax = $"0.6 {1 - 0.1 * i + 0.006}", 
+                    }
+                };
+                container.Add(PlayerKills, mainName);
+                var PlayerDeaths = new CuiLabel
+                {
+                    Text =
+                    {
+                        Text = $"{topPlayer.deaths}",
+                        FontSize = 14,
+                        Align = TextAnchor.UpperCenter
+                    },
+                    RectTransform =
+                    {
+                        AnchorMin = $"0.6 {1 - 0.1 * i - 0.2}",
+                        AnchorMax = $"0.7 {1 - 0.1 * i + 0.006}", 
+                    }
+                };
+                container.Add(PlayerDeaths, mainName);
+                
+                var PlayerRatio = new CuiLabel
+                {
+                    Text =
+                    {
+                        Text = $"{topPlayer.ratio}",
+                        FontSize = 14,
+                        Align = TextAnchor.UpperCenter
+                    },
+                    RectTransform =
+                    {
+                        AnchorMin = $"0.7 {1 - 0.1 * i - 0.2}",
+                        AnchorMax = $"0.9 {1 - 0.1 * i + 0.006}", 
+                    }
+                };
+                container.Add(PlayerRatio, mainName);
+                i++;
+            }
+            
             var closeButton = new CuiButton
             {
                 Button =
@@ -158,120 +334,6 @@ namespace Oxide.Plugins
                 }
             };
             container.Add(closeButton, mainName);
-            
-            var RankLabel = new CuiLabel
-            {
-                Text =
-                {
-                    Text = "Rank",
-                    FontSize = 18,
-                    Align = TextAnchor.MiddleCenter
-                },
-                RectTransform =
-                {
-                    AnchorMin = "0 0.9",
-                    AnchorMax = "0.1 1",
-                    OffsetMin = "-50 -50",
-                    OffsetMax = "50 50"
-                }
-            };
-            container.Add(RankLabel, mainName);
-            
-            var NameLabel = new CuiLabel
-            {
-                Text =
-                {
-                    Text = "Name",
-                    FontSize = 18,
-                    Align = TextAnchor.MiddleCenter
-                },
-                RectTransform =
-                {
-                    AnchorMin = "0.1 0.9",
-                    AnchorMax = "0.4 1",
-                    OffsetMin = "-50 -50",
-                    OffsetMax = "50 50"
-                }
-            };
-            container.Add(NameLabel, mainName);
-            
-            var KillsLabel = new CuiLabel
-            {
-                Text =
-                {
-                    Text = "Kills",
-                    FontSize = 18,
-                    Align = TextAnchor.MiddleCenter
-                },
-                RectTransform =
-                {
-                    AnchorMin = "0.4 0.9",
-                    AnchorMax = "0.5 1",
-                    OffsetMin = "-50 -50",
-                    OffsetMax = "50 50"
-                }
-            };
-            container.Add(KillsLabel, mainName);
-            
-            var DeathsLabel = new CuiLabel
-            {
-                Text =
-                {
-                    Text = "Deaths",
-                    FontSize = 18,
-                    Align = TextAnchor.MiddleCenter
-                },
-                RectTransform =
-                {
-                    AnchorMin = "0.5 0.9",
-                    AnchorMax = "0.6 1",
-                    OffsetMin = "-50 -50",
-                    OffsetMax = "50 50"
-                }
-            };
-            container.Add(DeathsLabel, mainName);
-            
-            var RatioLabel = new CuiLabel
-            {
-                Text =
-                {
-                    Text = "Ratio",
-                    FontSize = 18,
-                    Align = TextAnchor.MiddleCenter
-                },
-                RectTransform =
-                {
-                    AnchorMin = "0.6 0.9",
-                    AnchorMax = "0.8 1",
-                    OffsetMin = "-50 -50",
-                    OffsetMax = "50 50"
-                }
-            };
-            container.Add(RatioLabel, mainName);
-            
-            
-            
-
-            int i = 1;
-            foreach (var topPlayer in topPlayers)
-            {
-                var playerItem = new CuiLabel
-                {
-                    Text =
-                    {
-                        Text = $"{i} {topPlayer.name}",
-                        FontSize = 18,
-                        Align = TextAnchor.UpperLeft
-                    },
-                    RectTransform =
-                    {
-                        AnchorMin = $"0 {1 - 0.1 * i - 0.2}", //
-                        AnchorMax = $"1 {1 - 0.1 * i + 0.006}", 
-                    }
-                };
-                container.Add(playerItem, mainName);
-                i++;
-            }
 
             CuiHelper.AddUi(basePlayer, container);
         }
