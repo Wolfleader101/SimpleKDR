@@ -149,8 +149,6 @@ namespace Oxide.Plugins
                 {
                     AnchorMin = "0 0.9",
                     AnchorMax = "0.2 1",
-                    OffsetMin = "-50 -50",
-                    OffsetMax = "50 50"
                 }
             };
             container.Add(RankLabel, mainName);
@@ -167,8 +165,6 @@ namespace Oxide.Plugins
                 {
                     AnchorMin = "0.2 0.9",
                     AnchorMax = "0.4 1",
-                    OffsetMin = "-50 -50",
-                    OffsetMax = "50 50"
                 }
             };
             container.Add(NameLabel, mainName);
@@ -185,8 +181,6 @@ namespace Oxide.Plugins
                 {
                     AnchorMin = "0.4 0.9",
                     AnchorMax = "0.6 1",
-                    OffsetMin = "-50 -50",
-                    OffsetMax = "50 50"
                 }
             };
             container.Add(KillsLabel, mainName);
@@ -202,9 +196,7 @@ namespace Oxide.Plugins
                 RectTransform =
                 {
                     AnchorMin = "0.6 0.9",
-                    AnchorMax = "0.7 1",
-                    OffsetMin = "-50 -50",
-                    OffsetMax = "50 50"
+                    AnchorMax = "0.8 1",
                 }
             };
             container.Add(DeathsLabel, mainName);
@@ -219,49 +211,66 @@ namespace Oxide.Plugins
                 },
                 RectTransform =
                 {
-                    AnchorMin = "0.7 0.9",
+                    AnchorMin = "0.8 0.9",
                     AnchorMax = "0.9 1",
                     OffsetMin = "-50 -50",
                     OffsetMax = "50 50"
-                }
+                }    
             };
             container.Add(RatioLabel, mainName);
             
             
             
-
-            int i = 1;
-            foreach (var topPlayer in topPlayers)
+            
+            for (int i = 0; i < topPlayers.Count; i++)
             {
+                float size = 0.03f;
+                float n = 10;
+                float borderOffset = 0.1f;
+                float sizeLeft = 1f - size * n - borderOffset * 2;
+                float gap = sizeLeft / (n - 1);
+
+                var backgroundDark = new CuiPanel
+                {
+                    Image =
+                    {
+                        Color = "0.39 0.39 0.39 1"
+                    },
+                    RectTransform =
+                    {
+                        AnchorMin = $"0 {1 - (size * (i + 1) + i * gap + borderOffset)}",
+                        AnchorMax = $"1 {1 - (i * size + i * gap +borderOffset)}",
+                    },
+                };
+                if (i % 2 == 0)
+                    container.Add(backgroundDark, mainName);
                 var PlayerRank = new CuiLabel
                 {
                     Text =
                     {
-                        Text = $"{i}",
+                        Text = $"{i + 1}",
                         FontSize = 14,
-                        Align = TextAnchor.UpperCenter
+                        Align = TextAnchor.MiddleCenter
                     },
                     RectTransform =
                     {
-                        AnchorMin = $"0 {1 - 0.1 * i - 0.05}",
-                        AnchorMax = $"0.2 {1 - 0.1 * i}",
-                        OffsetMin = "-20 -20",
-                        OffsetMax = "10 15",
+                        AnchorMin = $"0 {1 - (size * (i + 1) + i * gap + borderOffset)}", // 1 - (size * (i + 1) + i * gap + borderOffset)
+                        AnchorMax = $"0.2 {1 - (i * size + i * gap +borderOffset)}", //1 - (i * size + i * gap + borderOffset)
                     }
                 };
                 container.Add(PlayerRank, mainName);
-                var PlayerName = new CuiLabel
+                var PlayerName = new CuiLabel    
                 {
                     Text =
                     {
-                        Text = $"{topPlayer.name}",
+                        Text = $"{topPlayers[i].name}",
                         FontSize = 14,
-                        Align = TextAnchor.UpperLeft
+                        Align = TextAnchor.MiddleCenter
                     },
                     RectTransform =
                     {
-                        AnchorMin = $"0.2 {1 - 0.1 * i - 0.2}",
-                        AnchorMax = $"0.4 {1 - 0.1 * i + 0.006}", 
+                        AnchorMin = $"0.2 {1 - (size * (i + 1) + i * gap + borderOffset)}",
+                        AnchorMax = $"0.4 {1 - (i * size + i * gap +borderOffset)}", 
                     }
                 };
                 container.Add(PlayerName, mainName);
@@ -269,14 +278,14 @@ namespace Oxide.Plugins
                 {
                     Text =
                     {
-                        Text = $"{topPlayer.kills}",
+                        Text = $"{topPlayers[i].kills}",
                         FontSize = 14,
-                        Align = TextAnchor.UpperCenter
+                        Align = TextAnchor.MiddleCenter
                     },
                     RectTransform =
                     {
-                        AnchorMin = $"0.4 {1 - 0.1 * i - 0.2}",
-                        AnchorMax = $"0.6 {1 - 0.1 * i + 0.006}", 
+                        AnchorMin = $"0.4 {1 - (size * (i + 1) + i * gap + borderOffset)}",
+                        AnchorMax = $"0.6 {1 - (i * size + i * gap +borderOffset)}", 
                     }
                 };
                 container.Add(PlayerKills, mainName);
@@ -284,14 +293,14 @@ namespace Oxide.Plugins
                 {
                     Text =
                     {
-                        Text = $"{topPlayer.deaths}",
+                        Text = $"{topPlayers[i].deaths}",
                         FontSize = 14,
-                        Align = TextAnchor.UpperCenter
+                        Align = TextAnchor.MiddleCenter
                     },
                     RectTransform =
                     {
-                        AnchorMin = $"0.6 {1 - 0.1 * i - 0.2}",
-                        AnchorMax = $"0.7 {1 - 0.1 * i + 0.006}", 
+                        AnchorMin = $"0.6 {1 - (size * (i + 1) + i * gap + borderOffset)}",
+                        AnchorMax = $"0.8 {1 - (i * size + i * gap +borderOffset)}", 
                     }
                 };
                 container.Add(PlayerDeaths, mainName);
@@ -300,18 +309,17 @@ namespace Oxide.Plugins
                 {
                     Text =
                     {
-                        Text = $"{topPlayer.ratio}",
+                        Text = $"{topPlayers[i].ratio}",
                         FontSize = 14,
-                        Align = TextAnchor.UpperCenter
+                        Align = TextAnchor.MiddleCenter
                     },
                     RectTransform =
                     {
-                        AnchorMin = $"0.7 {1 - 0.1 * i - 0.2}",
-                        AnchorMax = $"0.9 {1 - 0.1 * i + 0.006}", 
+                        AnchorMin = $"0.8 {1 - (size * (i + 1) + i * gap + borderOffset)}",
+                        AnchorMax = $"0.9 {1 - (i * size + i * gap +borderOffset)}", 
                     }
                 };
                 container.Add(PlayerRatio, mainName);
-                i++;
             }
             
             var closeButton = new CuiButton
@@ -338,7 +346,7 @@ namespace Oxide.Plugins
             container.Add(closeButton, mainName);
 
             CuiHelper.AddUi(basePlayer, container);
-        }
+            }
 
         #endregion
 
