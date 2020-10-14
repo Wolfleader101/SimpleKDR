@@ -245,6 +245,8 @@ namespace Oxide.Plugins
                     {
                         AnchorMin = $"0 {1 - 0.1 * i - 0.05}",
                         AnchorMax = $"0.2 {1 - 0.1 * i}",
+                        OffsetMin = "-20 -20",
+                        OffsetMax = "10 15",
                     }
                 };
                 container.Add(PlayerRank, mainName);
