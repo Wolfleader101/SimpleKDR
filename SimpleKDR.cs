@@ -230,11 +230,13 @@ namespace Oxide.Plugins
                 float sizeLeft = 1f - size * n - borderOffset * 2;
                 float gap = sizeLeft / (n - 1);
 
+                string TopPlayerColor = "1 0.78 0 1";
+                string BackgroundDarkColor = "0.39 0.39 0.39 1";
                 var backgroundDark = new CuiPanel
                 {
                     Image =
                     {
-                        Color = "0.39 0.39 0.39 1"
+                        Color = i == 0 ? TopPlayerColor : BackgroundDarkColor
                     },
                     RectTransform =
                     {
