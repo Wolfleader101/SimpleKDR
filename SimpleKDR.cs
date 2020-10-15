@@ -120,10 +120,13 @@ namespace Oxide.Plugins
                  return;
             }
 
+            string RatioText = foundPlayer.ratio >= 1
+                ? $"<color=green>{foundPlayer.ratio} </color>"
+                : $"<color=red>{foundPlayer.ratio} </color>";
             player.Reply(
-                $"<align=center><color=red><b>Your KDR is:</b></color> <color=green>{foundPlayer.ratio} </color>\n" +
-                $"<color=green><b>Kills:</b> {foundPlayer.kills} </color>  \n" +
-                $"<color=red><b>Deaths:</b> {foundPlayer.deaths} </color> \n"
+                $"<align=center><color=orange><b>Your KDR is:</b></color> {RatioText}\n" +
+                $"<color=orange><b>Kills:</b><color=green> {foundPlayer.kills} </color>  \n" +
+                $"<color=orange><b>Deaths:</b><color=red> {foundPlayer.deaths} </color> \n"
             );
 
 
