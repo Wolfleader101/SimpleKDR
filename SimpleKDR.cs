@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Network;
 using Oxide.Core;
 using Oxide.Core.Configuration;
 using Oxide.Core.Libraries.Covalence;
@@ -10,13 +11,12 @@ using UnityEngine;
 
 namespace Oxide.Plugins
 {
-    [Info("SimpleKDR", "Wolfleader101", "0.1.0")]
+    [Info("SimpleKDR", "Wolfleader101", "1.0.2")]
     [Description("Display your KDR and leaderboard of kills")]
     public class SimpleKDR : CovalencePlugin
     {
         #region variables
-
-        private DynamicConfigFile _dataFile = Interface.Oxide.DataFileSystem.GetDatafile("KDRData");
+        
         private StoredData _storedData;
 
         #endregion
@@ -26,9 +26,18 @@ namespace Oxide.Plugins
         private void Init()
         {
             _storedData = Interface.Oxide.DataFileSystem.ReadObject<StoredData>("KDRData");
+            if (_storedData == null)
+            {
+                _storedData = new StoredData();
+                _storedData.Players = new List<PlayerKDR>();
+            }
+            foreach (var player in BasePlayer.activePlayerList)
+            {
+                AddPlayer(player);
+            }
             timer.Every(60f, () =>
             {
-                _storedData = Interface.Oxide.DataFileSystem.ReadObject<StoredData>("KDRData");
+                Interface.Oxide.DataFileSystem.WriteObject("KDRData", _storedData);
             });
         }
 
@@ -42,17 +51,11 @@ namespace Oxide.Plugins
             Interface.Oxide.DataFileSystem.WriteObject("KDRData", _storedData);
         }
         
-
-
         void OnPlayerConnected(BasePlayer player)
         {
-            Puts($"{player.displayName}");
-            PlayerKDR playerKdr = new PlayerKDR(player);
-            if (_storedData.Players.Contains(playerKdr)) return;
-            _storedData.Players.Add(playerKdr);
+            AddPlayer(player);
         }
-
-
+        
         void OnPlayerDeath(BasePlayer player, HitInfo info)
         {
             if (player == null) return;
@@ -60,9 +63,8 @@ namespace Oxide.Plugins
             if (player == info.InitiatorPlayer) return;
 
             // RE ENABLE LATER
-             if (player.inventory.FindItemID("rifle.ak") == null ||
-                 player.inventory.FindItemID("lmg.M249") == null) return;
-
+             if (player.inventory.FindItemID("rifle.ak") != null ||
+                 player.inventory.FindItemID("lmg.M249") != null) return;
 
             IncreaseKills(info.InitiatorPlayer);
             IncreaseDeaths(player);
@@ -71,6 +73,14 @@ namespace Oxide.Plugins
         #endregion
 
         #region Methods
+        
+        void AddPlayer(BasePlayer player)
+        {
+            PlayerKDR playerKdr = new PlayerKDR(player);
+            if (_storedData.Players.Find(ply => ply.name == player.displayName) != null) return;
+            _storedData.Players.Add(playerKdr);
+            Interface.Oxide.DataFileSystem.WriteObject("KDRData", _storedData);
+        }
 
         void IncreaseKills(BasePlayer player)
         {
@@ -103,7 +113,6 @@ namespace Oxide.Plugins
             {
                 player.ratio = (float) player.kills / player.deaths;
             }
-            
         }
 
         #endregion
@@ -143,6 +152,14 @@ namespace Oxide.Plugins
             BasePlayer basePlayer = player.Object as BasePlayer;
             
             var foundPlayer = _storedData.Players.Find(item => item.name == player.Name);
+            if (foundPlayer == null)
+            {
+                Puts("For some reason player was null");
+                PlayerKDR playerKdr = new PlayerKDR(basePlayer);
+                _storedData.Players.Add(playerKdr);
+                Interface.Oxide.DataFileSystem.WriteObject("KDRData", _storedData);
+                foundPlayer = _storedData.Players.Find(item => item.name == player.Name);
+            }
 
             var container = new CuiElementContainer();
             var mainName = container.Add(new CuiPanel
