@@ -60,8 +60,8 @@ namespace Oxide.Plugins
             if (player == info.InitiatorPlayer) return;
 
             // RE ENABLE LATER
-            // if (player.inventory.FindItemID("rifle.ak") == null ||
-            //     player.inventory.FindItemID("lmg.M249") == null) return;
+             if (player.inventory.FindItemID("rifle.ak") == null ||
+                 player.inventory.FindItemID("lmg.M249") == null) return;
 
 
             IncreaseKills(info.InitiatorPlayer);
