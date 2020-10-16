@@ -11,12 +11,12 @@ using UnityEngine;
 
 namespace Oxide.Plugins
 {
-    [Info("SimpleKDR", "Wolfleader101", "1.0.3")]
+    [Info("SimpleKDR", "Wolfleader101", "1.2.0")]
     [Description("Display your KDR and leaderboard of kills")]
     public class SimpleKDR : CovalencePlugin
     {
         #region variables
-        
+
         private StoredData _storedData;
 
         #endregion
@@ -31,14 +31,13 @@ namespace Oxide.Plugins
                 _storedData = new StoredData();
                 _storedData.Players = new List<PlayerKDR>();
             }
+
             foreach (var player in BasePlayer.activePlayerList)
             {
                 AddPlayer(player);
             }
-            timer.Every(60f, () =>
-            {
-                Interface.Oxide.DataFileSystem.WriteObject("KDRData", _storedData);
-            });
+
+            timer.Every(60f, () => { Interface.Oxide.DataFileSystem.WriteObject("KDRData", _storedData); });
         }
 
         private void OnServerSave()
@@ -50,35 +49,55 @@ namespace Oxide.Plugins
         {
             Interface.Oxide.DataFileSystem.WriteObject("KDRData", _storedData);
         }
-        
+
         void OnPlayerConnected(BasePlayer player)
         {
             AddPlayer(player);
         }
-        
+
         void OnPlayerDeath(BasePlayer player, HitInfo info)
         {
             if (player == null) return;
             if (info == null) return;
             if (player == info.InitiatorPlayer) return;
-            
-            
+
             // RE ENABLE LATER
-             if (player.inventory.FindItemID("rifle.ak") == null ||
-                 player.inventory.FindItemID("lmg.M249") == null) return;
+            if (player.inventory.FindItemID("rifle.ak") == null &&
+                player.inventory.FindItemID("lmg.M249") == null) return;
 
             IncreaseKills(info.InitiatorPlayer);
             IncreaseDeaths(player);
+        }
+        
+        void OnEntityTakeDamage(BasePlayer player, HitInfo info)
+        {
+            
+            if (player == null) return;
+            if (info == null) return;
+            if (player == info.InitiatorPlayer) return;
+
+            if (player.inventory.FindItemID("rifle.ak") == null &&
+                player.inventory.FindItemID("lmg.M249") == null) return;
+            
+            NextTick(() =>
+            {
+                if (player.IsWounded())
+                {
+                    IncreaseKills(info.InitiatorPlayer);
+                    IncreaseDeaths(player);
+                }
+            });
+
         }
 
         #endregion
 
         #region Methods
-        
+
         void AddPlayer(BasePlayer player)
         {
             PlayerKDR playerKdr = new PlayerKDR(player);
-            if (_storedData.Players.Find(ply => ply.name == player.displayName) != null) return;
+            if (_storedData.Players.Find(ply => ply.id == player.UserIDString) != null) return;
             _storedData.Players.Add(playerKdr);
             Interface.Oxide.DataFileSystem.WriteObject("KDRData", _storedData);
         }
@@ -87,7 +106,7 @@ namespace Oxide.Plugins
         {
             if (player == null) return;
 
-            var foundPlayer = _storedData.Players.Find(item => item.name == player.displayName);
+            var foundPlayer = _storedData.Players.Find(item => item.id == player.UserIDString);
             foundPlayer.kills++;
             UpdateRatio(foundPlayer);
         }
@@ -95,7 +114,7 @@ namespace Oxide.Plugins
         void IncreaseDeaths(BasePlayer player)
         {
             if (player == null) return;
-            var foundPlayer = _storedData.Players.Find(item => item.name == player.displayName);
+            var foundPlayer = _storedData.Players.Find(item => item.id == player.UserIDString);
             if (foundPlayer == null) return;
 
             foundPlayer.deaths++;
@@ -123,11 +142,11 @@ namespace Oxide.Plugins
         [Command("kd")]
         private void KDCommand(IPlayer player, string command, string[] args)
         {
-            var foundPlayer = _storedData.Players.Find(item => item.name == player.Name);
+            var foundPlayer = _storedData.Players.Find(item => item.id == player.Id);
             if (foundPlayer == null)
             {
-                 player.Reply("You don't have a KD yet");
-                 return;
+                player.Reply("You don't have a KD yet");
+                return;
             }
 
             string RatioText = foundPlayer.ratio >= 1
@@ -151,15 +170,15 @@ namespace Oxide.Plugins
             var topPlayers = _storedData.Players.OrderByDescending(item => item.kills).Take(10).ToList();
 
             BasePlayer basePlayer = player.Object as BasePlayer;
-            
-            var foundPlayer = _storedData.Players.Find(item => item.name == player.Name);
+
+            var foundPlayer = _storedData.Players.Find(item => item.id == player.Id);
             if (foundPlayer == null)
             {
                 Puts("For some reason player was null");
                 PlayerKDR playerKdr = new PlayerKDR(basePlayer);
                 _storedData.Players.Add(playerKdr);
                 Interface.Oxide.DataFileSystem.WriteObject("KDRData", _storedData);
-                foundPlayer = _storedData.Players.Find(item => item.name == player.Name);
+                foundPlayer = _storedData.Players.Find(item => item.id == player.Id);
             }
 
             var container = new CuiElementContainer();
@@ -388,7 +407,7 @@ namespace Oxide.Plugins
                 }
             };
             container.Add(closeButton, mainName);
-            
+
             var UsersKills = new CuiLabel
             {
                 Text =
@@ -420,7 +439,7 @@ namespace Oxide.Plugins
                     AnchorMax = $"0.6 0.2",
                 }
             };
-           
+
             string userRatioColor = foundPlayer.ratio >= 1 ? "0 1 0 1" : "1 0 0 1";
             var UsersRatio = new CuiLabel
             {
@@ -437,14 +456,14 @@ namespace Oxide.Plugins
                     AnchorMax = $"0.9 0.2",
                 }
             };
-            
+
             if (foundPlayer != null)
             {
                 container.Add(UsersKills, mainName);
                 container.Add(UsersDeaths, mainName);
                 container.Add(UsersRatio, mainName);
             }
-            
+
 
             CuiHelper.AddUi(basePlayer, container);
         }
@@ -462,6 +481,7 @@ namespace Oxide.Plugins
         private class PlayerKDR
         {
             public string name { get; set; }
+            public string id { get; set; }
             public int kills { get; set; }
             public int deaths { get; set; }
             public float ratio { get; set; }
@@ -473,6 +493,7 @@ namespace Oxide.Plugins
             public PlayerKDR(BasePlayer player)
             {
                 name = player.displayName;
+                id = player.UserIDString;
                 kills = 0;
                 deaths = 0;
                 ratio = 0;
