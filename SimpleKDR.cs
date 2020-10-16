@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace Oxide.Plugins
 {
-    [Info("SimpleKDR", "Wolfleader101", "1.0.2")]
+    [Info("SimpleKDR", "Wolfleader101", "1.0.3")]
     [Description("Display your KDR and leaderboard of kills")]
     public class SimpleKDR : CovalencePlugin
     {
@@ -61,10 +61,11 @@ namespace Oxide.Plugins
             if (player == null) return;
             if (info == null) return;
             if (player == info.InitiatorPlayer) return;
-
+            
+            
             // RE ENABLE LATER
-             if (player.inventory.FindItemID("rifle.ak") != null ||
-                 player.inventory.FindItemID("lmg.M249") != null) return;
+             if (player.inventory.FindItemID("rifle.ak") == null ||
+                 player.inventory.FindItemID("lmg.M249") == null) return;
 
             IncreaseKills(info.InitiatorPlayer);
             IncreaseDeaths(player);
