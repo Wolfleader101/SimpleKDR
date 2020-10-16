@@ -62,12 +62,10 @@ namespace Oxide.Plugins
             if (player == null) return;
             if (info == null) return;
             if (player == info.InitiatorPlayer) return;
-
-            Puts($"no ak");
+            
             if (player.inventory.FindItemID("rifle.ak") == null &&
                 player.inventory.FindItemID("lmg.M249") == null) return;
-            Puts("AK");
-            
+
             NextTick(() =>
             {
                 if (player.IsWounded())
