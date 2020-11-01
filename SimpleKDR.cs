@@ -65,19 +65,25 @@ namespace Oxide.Plugins
             if (player.inventory.FindItemID("rifle.ak") == null &&
                 player.inventory.FindItemID("lmg.M249") == null) return;
 
-            if (player.currentTeam == info.InitiatorPlayer.currentTeam)
-            {
-                DecreaseKills(info.InitiatorPlayer);
-            }
-
             NextTick(() =>
             {
                 if (player.IsWounded())
                 {
+                    if (player.currentTeam == info.InitiatorPlayer.currentTeam)
+                    { 
+                        DecreaseKills(info.InitiatorPlayer);
+                        return;
+                    }
                     IncreaseKills(info.InitiatorPlayer);
                     IncreaseDeaths(player);
                 } else if (player.IsDead())
                 {
+                    if (player.currentTeam == info.InitiatorPlayer.currentTeam)
+                    { 
+                        DecreaseKills(info.InitiatorPlayer);
+                        return;
+                    }
+                    
                     IncreaseKills(info.InitiatorPlayer);
                     IncreaseDeaths(player);
                 }
