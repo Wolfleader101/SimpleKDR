@@ -5,6 +5,7 @@ using Network;
 using Oxide.Core;
 using Oxide.Core.Configuration;
 using Oxide.Core.Libraries.Covalence;
+using Oxide.Game.Rust;
 using Oxide.Game.Rust.Cui;
 using Steamworks.ServerList;
 using UnityEngine;
@@ -36,7 +37,6 @@ namespace Oxide.Plugins
             {
                 AddPlayer(player);
             }
-
             timer.Every(60f, () => { Interface.Oxide.DataFileSystem.WriteObject("KDRData", _storedData); });
         }
 
@@ -58,13 +58,17 @@ namespace Oxide.Plugins
         
         void OnEntityTakeDamage(BasePlayer player, HitInfo info)
         {
-            
             if (player == null) return;
             if (info == null) return;
             if (player == info.InitiatorPlayer) return;
             
             if (player.inventory.FindItemID("rifle.ak") == null &&
                 player.inventory.FindItemID("lmg.M249") == null) return;
+
+            if (player.currentTeam == info.InitiatorPlayer.currentTeam)
+            {
+                DecreaseKills(info.InitiatorPlayer);
+            }
 
             NextTick(() =>
             {
@@ -102,6 +106,14 @@ namespace Oxide.Plugins
             UpdateRatio(foundPlayer);
         }
 
+        void DecreaseKills(BasePlayer player)
+        {
+            if (player == null) return;
+
+            var foundPlayer = _storedData.Players.Find(item => item.id == player.UserIDString);
+            foundPlayer.kills--;
+            UpdateRatio(foundPlayer);
+        }
         void IncreaseDeaths(BasePlayer player)
         {
             if (player == null) return;
