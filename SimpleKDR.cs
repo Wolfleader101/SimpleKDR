@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace Oxide.Plugins
 {
-    [Info("SimpleKDR", "Wolfleader101", "1.3.0")]
+    [Info("SimpleKDR", "Wolfleader101", "1.4.0")]
     [Description("Display your KDR and leaderboard of kills")]
     public class SimpleKDR : CovalencePlugin
     {
@@ -64,59 +64,38 @@ namespace Oxide.Plugins
             if (player == null) return;
             if (info == null) return;
             if (player == info.InitiatorPlayer) return;
-            DownedPlayer foundPlayer = ActivePlayers.Find(ply => ply.playerName == player.displayName);
             int foundPlayerIndex = ActivePlayers.FindIndex(ply => ply.playerName == player.displayName);
 
             if ((player.inventory.FindItemID("rifle.ak") == null &&
-                 player.inventory.FindItemID("lmg.M249") == null) || foundPlayer.hasGun) return;
-
-            foundPlayer.hasGun = true;
-            ActivePlayers[foundPlayerIndex] = foundPlayer;
+                 player.inventory.FindItemID("lmg.M249") == null) || ActivePlayers[foundPlayerIndex].hasGun) return;
+            
+            ActivePlayers[foundPlayerIndex].hasGun = true;
 
             NextTick(() =>
             {
                 if (player.IsWounded())
                 {
-                    foundPlayer.isDowned = true;
-                    ActivePlayers[foundPlayerIndex] = foundPlayer;
-                    
-                    if (player.currentTeam == 0 && info.InitiatorPlayer.currentTeam == 0)
-                    {
-                        IncreaseKills(info.InitiatorPlayer);
-                        IncreaseDeaths(player);
-                        return;
-                    }
-                    
-                    if (player.currentTeam == info.InitiatorPlayer.currentTeam)
-                    {
-                        DecreaseKills(info.InitiatorPlayer);
-                        IncreaseDeaths(player);
-                    }
-                    else
-                    {
-                        IncreaseKills(info.InitiatorPlayer);
-                        IncreaseDeaths(player);
-                    }
+                    ActivePlayers[foundPlayerIndex].isDowned = true;
+                    ActivePlayers[foundPlayerIndex].initiatorPlayer = info.InitiatorPlayer;
                 }
                 else if (player.IsDead())
                 {
-                    foundPlayer.hasGun = false;
-                    ActivePlayers[foundPlayerIndex] = foundPlayer;
-                    if (foundPlayer.isDowned)
-                    {
-                        foundPlayer.isDowned = false;
-                        ActivePlayers[foundPlayerIndex] = foundPlayer;
-                        return;
-                    }
+                    ActivePlayers[foundPlayerIndex].hasGun = false;
                     
-                    if (player.currentTeam == 0 && info.InitiatorPlayer.currentTeam == 0)
+                    if (ActivePlayers[foundPlayerIndex].initiatorPlayer == null)
+                        ActivePlayers[foundPlayerIndex].initiatorPlayer = info.InitiatorPlayer;
+                    
+                    if (ActivePlayers[foundPlayerIndex].isDowned)
+                        ActivePlayers[foundPlayerIndex].isDowned = false;
+
+                    if (player.currentTeam == 0 && ActivePlayers[foundPlayerIndex].initiatorPlayer.currentTeam == 0)
                     {
                         IncreaseKills(info.InitiatorPlayer);
                         IncreaseDeaths(player);
                         return;
                     }
-
-                    if (player.currentTeam == info.InitiatorPlayer.currentTeam)
+                    
+                    if (player.currentTeam == ActivePlayers[foundPlayerIndex].initiatorPlayer.currentTeam)
                     {
                         DecreaseKills(info.InitiatorPlayer);
                         IncreaseDeaths(player);
@@ -530,6 +509,7 @@ namespace Oxide.Plugins
             public string playerName { get; set; }
             public bool hasGun { get; set; }
             public bool isDowned { get; set; }
+            public BasePlayer initiatorPlayer { get; set; }
 
             public DownedPlayer()
             {
@@ -540,6 +520,7 @@ namespace Oxide.Plugins
                 playerName = name;
                 hasGun = false;
                 isDowned = false;
+                initiatorPlayer = null;
             }
         }
 
