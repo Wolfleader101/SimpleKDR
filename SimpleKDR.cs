@@ -34,11 +34,12 @@ namespace Oxide.Plugins
                 _storedData = new StoredData();
                 _storedData.Players = new List<PlayerKDR>();
             }
-            
+
             foreach (var player in BasePlayer.activePlayerList)
             {
                 AddPlayer(player);
             }
+
             timer.Every(60f, () => { Interface.Oxide.DataFileSystem.WriteObject("KDRData", _storedData); });
         }
 
@@ -56,20 +57,19 @@ namespace Oxide.Plugins
         {
             AddPlayer(player);
         }
-        
-        
+
+
         void OnEntityTakeDamage(BasePlayer player, HitInfo info)
         {
-            
             if (player == null) return;
             if (info == null) return;
             if (player == info.InitiatorPlayer) return;
             DownedPlayer foundPlayer = ActivePlayers.Find(ply => ply.playerName == player.displayName);
             int foundPlayerIndex = ActivePlayers.FindIndex(ply => ply.playerName == player.displayName);
-            
+
             if ((player.inventory.FindItemID("rifle.ak") == null &&
-                player.inventory.FindItemID("lmg.M249") == null) || foundPlayer.hasGun) return;
-            
+                 player.inventory.FindItemID("lmg.M249") == null) || foundPlayer.hasGun) return;
+
             foundPlayer.hasGun = true;
             ActivePlayers[foundPlayerIndex] = foundPlayer;
 
@@ -78,13 +78,27 @@ namespace Oxide.Plugins
                 if (player.IsWounded())
                 {
                     foundPlayer.isDowned = true;
-                   ActivePlayers[foundPlayerIndex] = foundPlayer;
-                    if (player.currentTeam == info.InitiatorPlayer.currentTeam) return;
+                    ActivePlayers[foundPlayerIndex] = foundPlayer;
                     
-                    IncreaseKills(info.InitiatorPlayer);
-                    IncreaseDeaths(player);
-
-                } else if (player.IsDead())
+                    if (player.currentTeam == 0 && info.InitiatorPlayer.currentTeam == 0)
+                    {
+                        IncreaseKills(info.InitiatorPlayer);
+                        IncreaseDeaths(player);
+                        return;
+                    }
+                    
+                    if (player.currentTeam == info.InitiatorPlayer.currentTeam)
+                    {
+                        DecreaseKills(info.InitiatorPlayer);
+                        IncreaseDeaths(player);
+                    }
+                    else
+                    {
+                        IncreaseKills(info.InitiatorPlayer);
+                        IncreaseDeaths(player);
+                    }
+                }
+                else if (player.IsDead())
                 {
                     foundPlayer.hasGun = false;
                     ActivePlayers[foundPlayerIndex] = foundPlayer;
@@ -94,16 +108,16 @@ namespace Oxide.Plugins
                         ActivePlayers[foundPlayerIndex] = foundPlayer;
                         return;
                     }
-
-
+                    
                     if (player.currentTeam == 0 && info.InitiatorPlayer.currentTeam == 0)
                     {
                         IncreaseKills(info.InitiatorPlayer);
                         IncreaseDeaths(player);
                         return;
                     }
+
                     if (player.currentTeam == info.InitiatorPlayer.currentTeam)
-                    { 
+                    {
                         DecreaseKills(info.InitiatorPlayer);
                         IncreaseDeaths(player);
                     }
@@ -112,10 +126,8 @@ namespace Oxide.Plugins
                         IncreaseKills(info.InitiatorPlayer);
                         IncreaseDeaths(player);
                     }
-                    
                 }
             });
-
         }
 
         #endregion
@@ -125,14 +137,13 @@ namespace Oxide.Plugins
         void AddPlayer(BasePlayer player)
         {
             PlayerKDR playerKdr = new PlayerKDR(player);
-            
+
             if (_storedData.Players.Find(ply => ply.id == player.UserIDString) != null) return;
             _storedData.Players.Add(playerKdr);
             Interface.Oxide.DataFileSystem.WriteObject("KDRData", _storedData);
-            
+
             DownedPlayer downedPlayer = new DownedPlayer(player.displayName);
             ActivePlayers.Add(downedPlayer);
-
         }
 
         void IncreaseKills(BasePlayer player)
@@ -152,6 +163,7 @@ namespace Oxide.Plugins
             foundPlayer.kills--;
             UpdateRatio(foundPlayer);
         }
+
         void IncreaseDeaths(BasePlayer player)
         {
             if (player == null) return;
@@ -516,13 +528,13 @@ namespace Oxide.Plugins
         private class DownedPlayer
         {
             public string playerName { get; set; }
-            public bool hasGun { get; set;}
+            public bool hasGun { get; set; }
             public bool isDowned { get; set; }
 
             public DownedPlayer()
             {
-                
             }
+
             public DownedPlayer(string name)
             {
                 playerName = name;
@@ -530,6 +542,7 @@ namespace Oxide.Plugins
                 isDowned = false;
             }
         }
+
         private class StoredData
         {
             public List<PlayerKDR> Players = new List<PlayerKDR>();
@@ -546,8 +559,8 @@ namespace Oxide.Plugins
 
             public PlayerKDR()
             {
-                
             }
+
             public PlayerKDR(BasePlayer player)
             {
                 name = player.displayName;
