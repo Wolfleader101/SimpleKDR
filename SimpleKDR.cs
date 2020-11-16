@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace Oxide.Plugins
 {
-    [Info("SimpleKDR", "Wolfleader101", "1.3.6")]
+    [Info("SimpleKDR", "Wolfleader101", "1.3.0")]
     [Description("Display your KDR and leaderboard of kills")]
     public class SimpleKDR : CovalencePlugin
     {
